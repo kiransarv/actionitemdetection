@@ -1,16 +1,15 @@
 import pandas as pd;
 from nltk.tokenize import sent_tokenize;
 
-import re;
-
-fororg_email_pattern = re.compile("-{5,}");
 
 def get_sentences(file=None):
     sentences = ["Can you complete assignment by EOD", "Are you sure about the meeting", "Lets fix our time as 1:30 PM",
                  "Please pass on the material and minutes as soon as possible",
                  "Who all are coming to meeting tomorrow ?",
                  "Also can you look at EOG as a play on rising oil and gas prices",
-                 "Greg,   How about either next Tuesday or Thursday?"]
+                 "Greg,   How about either next Tuesday or Thursday?",
+                 "Who can do this work in two days",
+                 "Finish it by EOD"]
 
 
     '''dataset = pd.read_csv(file);
