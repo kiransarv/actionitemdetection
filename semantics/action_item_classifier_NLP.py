@@ -3,7 +3,7 @@ import pandas as pd;
 from nltk import RegexpParser, sent_tokenize;
 from projroot import get_slang_words_path;
 import nltk;
-import re;
+import re, sys;
 
 fororg_email_pattern = re.compile("-{5,}");
 
@@ -48,7 +48,6 @@ def tag_sentences_verbose(doc):
 def pos_tag_granular(doc):
     return [(token.text, token.tag_) for token in doc]
 
-
 def pos_tag_broader(doc):
     return [(token.text, token.pos_) for token in doc]
 
@@ -91,10 +90,14 @@ def classify_action_item(doc):
         if type(chunk) is nltk.tree.Tree:
             label = chunk.label();
             #print(doc.text, label)
-            if "INTJ-PHRASE" in label or "VERB-PRO-PHRASE" in label:
+            '''if "INTJ-PHRASE" in label or "VERB-PRO-PHRASE" in label:
                 return 1.0;
             elif "PRON-PHRASE" in label:
+                return 1.0;'''
+            if "INTJ-PHRASE" in label:
                 return 1.0;
+            '''elif "PRON-PHRASE" in label:
+                return 1.0;'''
 
     tokens = get_tokens(doc);
     for token in tokens:
@@ -121,48 +124,49 @@ def classify_action_item(doc):
     return 0.0;
 
 
-nlp = spacy.load("en_core_web_sm");
+if __name__=="__main__":
+    nlp = spacy.load("en_core_web_sm");
 
-dataset = pd.read_csv("/home/kiran/Datasets/Huddl/emails.csv");
-#dataset = dataset.head(100);
-dataset = dataset.drop(columns="file");
-msgs = dataset["message"];
+    dataset = pd.read_csv(sys.argv[1]);
+    #dataset = dataset.head(100);
+    dataset = dataset.drop(columns="file");
+    msgs = dataset["message"];
 
-for msg in msgs:
-    index = -1;
-    if "X-FileName" in msg:
-        index = msg.index("X-FileName");
+    for msg in msgs:
+        index = -1;
+        if "X-FileName" in msg:
+            index = msg.index("X-FileName");
 
-    if index != -1:
-        msgsubstr = msg[index:];
-        lines = msgsubstr.split("\n");
-        if len(lines) > 1:
-            text = " ".join(lines[1:]);
-            sens = sent_tokenize(text);
-            for sen in sens:
-                match = re.search(fororg_email_pattern, sen)
-                if match:
-                    continue;
+        if index != -1:
+            msgsubstr = msg[index:];
+            lines = msgsubstr.split("\n");
+            if len(lines) > 1:
+                text = " ".join(lines[1:]);
+                sens = sent_tokenize(text);
+                for sen in sens:
+                    match = re.search(fororg_email_pattern, sen)
+                    if match:
+                        continue;
 
-                doc = nlp(sen);
-                prob = classify_action_item(doc);
-                print(sen, prob);
+                    doc = nlp(sen);
+                    prob = classify_action_item(doc);
+                    print(sen, prob);
 
-    print("*******************");
+        print("*******************");
 
-'''sentences = ["Can you complete assignment by EOD", "Are you sure about the meeting", "Lets fix our time as 1:30 PM",
-             "Please pass on the material and minutes as soon as possible",
-             "Who all are coming to meeting tomorrow ?",
-             "Also can you look at EOG as a play on rising oil and gas prices",
-             "Greg,   How about either next Tuesday or Thursday?",
-             "Who can do this work in two days",
-             "Finish it by EOD",
-             " Colleen,   Please add Mike Grigsby to the distribution",
-             "How is progress on creating the  spreadsheets.",
-             "It would also be good to have each person's phone number, in the event we need to reach them.",
-             "Open the \"utility\" spreadsheet and try to complete the analysis of whether it  is better to be a small commercial or a medium commercial (LP-1). "]
-
-for sen in sentences:
-    doc = nlp(sen);
-    prob = classify_action_item(doc);
-    print(sen, prob);'''
+    '''sentences = ["Can you complete assignment by EOD", "Are you sure about the meeting", "Lets fix our time as 1:30 PM",
+                 "Please pass on the material and minutes as soon as possible",
+                 "Who all are coming to meeting tomorrow ?",
+                 "Also can you look at EOG as a play on rising oil and gas prices",
+                 "Greg,   How about either next Tuesday or Thursday?",
+                 "Who can do this work in two days",
+                 "Finish it by EOD",
+                 " Colleen,   Please add Mike Grigsby to the distribution",
+                 "How is progress on creating the  spreadsheets.",
+                 "It would also be good to have each person's phone number, in the event we need to reach them.",
+                 "Open the \"utility\" spreadsheet and try to complete the analysis of whether it  is better to be a small commercial or a medium commercial (LP-1). "]
+    
+    for sen in sentences:
+        doc = nlp(sen);
+        prob = classify_action_item(doc);
+        print(sen, prob);'''

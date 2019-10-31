@@ -6,3 +6,6 @@ print(working_dir);
 def get_slang_words_path():
     return "/home/kiran/Workspace/ActionItem/resources/slang_words";
     #return os.path.join(working_dir, "resources/slang_words");
+
+def get_labeled_dataset_path():
+    return "/home/kiran/Datasets/Huddl/dataset";
