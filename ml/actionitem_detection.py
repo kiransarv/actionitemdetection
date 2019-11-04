@@ -51,7 +51,6 @@ def evaluatefmeasure(y_test, y_pred):
     return precision_recall_fscore_support(y_true=y_test, y_pred=y_pred);
 
 def pos_tag(doc=None):
-
     return None;
 
 def tranform_labels(labels):
